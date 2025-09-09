@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora do Pedreiro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #ff6b6b;
+            border-bottom-color: #ff6b6b;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .calc-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #ff6b6b;
+        }
+
+        .calc-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+        }
+
+        .result {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .result h4 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .price-table {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .price-table h4 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .price-input {
+            display: grid;
+            grid-template-columns: 2fr 120px 40px;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 5px 0;
+        }
+
+        .price-input label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .price-input input {
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .price-input input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        .price-input span {
+            font-weight: 600;
+            color: #666;
+            text-align: center;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #17a2b8;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tab {
+                font-size: 0.9rem;
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔨 Calculadora do Pedreiro</h1>
+            <p>Calcule materiais e custos da sua obra com precisão</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="alvenaria">Alvenaria</button>
+            <button class="nav-tab" data-tab="concreto">Concreto</button>
+            <button class="nav-tab" data-tab="ceramica">Cerâmica</button>
+            <button class="nav-tab" data-tab="tinta">Pintura</button>
+            <button class="nav-tab" data-tab="ferragem">Ferragem</button>
+            <button class="nav-tab" data-tab="orcamento">Orçamento</button>
+        </div>
+
+        <!-- Alvenaria -->
+        <div id="alvenaria" class="tab-content active">
+            <div class="calc-section">
+                <h3>🧱 Cálculo de Tijolos e Argamassa</h3>
+                <div class="info">
+                    <strong>Dica:</strong> Para tijolo comum (6 furos): 13 tijolos por m². Para tijolo baiano (8 furos): 12,5 tijolos por m².
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Comprimento da parede (m):</label>
+                        <input type="number" id="comprimento_parede" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Altura da parede (m):</label>
+                        <input type="number" id="altura_parede" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de tijolo:</label>
+                        <select id="tipo_tijolo">
+                            <option value="13">Comum (6 furos) - 13/m²</option>
+                            <option value="12.5">Baiano (8 furos) - 12,5/m²</option>
+                            <option value="25">Bloco 20x20x40 - 25/m²</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Área de aberturas (m²):</label>
+                        <input type="number" id="area_aberturas" step="0.1" value="0" min="0">
+                    </div>
+                </div>
+                <button class="btn" onclick="calcularAlvenaria()">Calcular Materiais</button>
+                <button class="btn btn-clear" onclick="limparFormulario('alvenaria')">Limpar</button>
+                <div id="resultado_alvenaria"></div>
+            </div>
+        </div>
+
+        <!-- Concreto -->
+        <div id="concreto" class="tab-content">
+            <div class="calc-section">
+                <h3>🏗️ Cálculo de Concreto</h3>
+                <div class="warning">
+                    <strong>Atenção:</strong> Adicione sempre 10% a mais para compensar perdas e ajustes.
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Comprimento (m):</label>
+                        <input type="number" id="comprimento_concreto" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Largura (m):</label>
+                        <input type="number" id="largura_concreto" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Espessura (cm):</label>
+                        <input type="number" id="espessura_concreto" step="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de concreto:</label>
+                        <select id="tipo_concreto">
+                            <option value="1:2:3">1:2:3 (Estrutural)</option>
+                            <option value="1:3:4">1:3:4 (Magro)</option>
+                            <option value="1:2:2">1:2:2 (Rico)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="calcularConcreto()">Calcular Materiais</button>
+                <button class="btn btn-clear" onclick="limparFormulario('concreto')">Limpar</button>
+                <div id="resultado_concreto"></div>
+            </div>
+        </div>
+
+        <!-- Cerâmica -->
+        <div id="ceramica" class="tab-content">
+            <div class="calc-section">
+                <h3>🔲 Cálculo de Cerâmica/Porcelanato</h3>
+                <div class="info">
+                    <strong>Dica:</strong> Sempre compre 10-15% a mais para quebras e reposições futuras.
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Comprimento do ambiente (m):</label>
+                        <input type="number" id="comprimento_ceramica" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Largura do ambiente (m):</label>
+                        <input type="number" id="largura_ceramica" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tamanho da cerâmica:</label>
+                        <select id="tamanho_ceramica">
+                            <option value="0.0625">25x25cm</option>
+                            <option value="0.09">30x30cm</option>
+                            <option value="0.16">40x40cm</option>
+                            <option value="0.25">50x50cm</option>
+                            <option value="0.36">60x60cm</option>
+                            <option value="0.48">80x60cm</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>% de quebra:</label>
+                        <input type="number" id="quebra_ceramica" value="15" min="5" max="25">
+                    </div>
+                </div>
+                <button class="btn" onclick="calcularCeramica()">Calcular Materiais</button>
+                <button class="btn btn-clear" onclick="limparFormulario('ceramica')">Limpar</button>
+                <div id="resultado_ceramica"></div>
+            </div>
+        </div>
+
+        <!-- Pintura -->
+        <div id="tinta" class="tab-content">
+            <div class="calc-section">
+                <h3>🎨 Cálculo de Tinta</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Área total a pintar (m²):</label>
+                        <input type="number" id="area_pintura" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de tinta:</label>
+                        <select id="tipo_tinta">
+                            <option value="12">Látex PVA (12m²/L)</option>
+                            <option value="10">Látex Acrílico (10m²/L)</option>
+                            <option value="8">Esmalte (8m²/L)</option>
+                            <option value="6">Tinta Óleo (6m²/L)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de demãos:</label>
+                        <input type="number" id="num_demaos" value="2" min="1" max="4">
+                    </div>
+                    <div class="form-group">
+                        <label>Precisa primer?</label>
+                        <select id="precisa_primer">
+                            <option value="sim">Sim</option>
+                            <option value="nao">Não</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="calcularTinta()">Calcular Materiais</button>
+                <button class="btn btn-clear" onclick="limparFormulario('tinta')">Limpar</button>
+                <div id="resultado_tinta"></div>
+            </div>
+        </div>
+
+        <!-- Ferragem -->
+        <div id="ferragem" class="tab-content">
+            <div class="calc-section">
+                <h3>⚒️ Cálculo de Ferragem</h3>
+                <div class="warning">
+                    <strong>Importante:</strong> Cálculos aproximados. Para estruturas críticas, consulte um engenheiro.
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Volume de concreto (m³):</label>
+                        <input type="number" id="volume_ferragem" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de estrutura:</label>
+                        <select id="tipo_estrutura">
+                            <option value="60">Laje (60 kg/m³)</option>
+                            <option value="80">Viga (80 kg/m³)</option>
+                            <option value="100">Pilar (100 kg/m³)</option>
+                            <option value="70">Fundação (70 kg/m³)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Bitola principal (mm):</label>
+                        <select id="bitola_principal">
+                            <option value="6.3">6.3mm</option>
+                            <option value="8">8mm</option>
+                            <option value="10">10mm</option>
+                            <option value="12.5">12.5mm</option>
+                            <option value="16">16mm</option>
+                            <option value="20">20mm</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="calcularFerragem()">Calcular Ferragem</button>
+                <button class="btn btn-clear" onclick="limparFormulario('ferragem')">Limpar</button>
+                <div id="resultado_ferragem"></div>
+            </div>
+        </div>
+
+        <!-- Orçamento -->
+        <div id="orcamento" class="tab-content">
+            <div class="calc-section">
+                <h3>💰 Orçamento da Obra</h3>
+                <div class="price-table">
+                    <h4>Tabela de Preços (R$)</h4>
+                    <div class="price-input">
+                        <label>Cimento (saco 50kg):</label>
+                        <input type="number" id="preco_cimento" value="32.00" step="0.01" min="0">
+                        <span>R$</span>
+                    </div>
+                    <div class="price-input">
+                        <label>Areia (m³):</label>
+                        <input type="number" id="preco_areia" value="45.00" step="0.01" min="0">
+                        <span>R$</span>
+                    </div>
+                    <div class="price-input">
+                        <label>Brita (m³):</label>
+                        <input type="number" id="preco_brita" value="50.00" step="0.01" min="0">
+                        <span>R$</span>
+                    </div>
+                    <div class="price-input">
+                        <label>Tijolo (milheiro):</label>
+                        <input type="number" id="preco_tijolo" value="450.00" step="0.01" min="0">
+                        <span>R$</span>
+                    </div>
+                    <div class="price-input">
+                        <label>Cerâmica (m²):</label>
+                        <input type="number" id="preco_ceramica_m2" value="25.00" step="0.01" min="0">
+                        <span>R$</span>
+                    </div>
+                    <div class="price-input">
+                        <label>Tinta (litro):</label>
+                        <input type="number" id="preco_tinta_litro" value="35.00" step="0.01" min="0">
+                        <span>R$</span>
+                    </div>
+                    <div class="price-input">
+                        <label>Ferro (kg):</label>
+                        <input type="number" id="preco_ferro_kg" value="6.50" step="0.01" min="0">
+                        <span>R$</span>
+                    </div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Área total da obra (m²):</label>
+                        <input type="number" id="area_total_obra" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Padrão de acabamento:</label>
+                        <select id="padrao_acabamento">
+                            <option value="300">Simples (R$ 300/m²)</option>
+                            <option value="500">Médio (R$ 500/m²)</option>
+                            <option value="800">Alto (R$ 800/m²)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="calcularOrcamento()">Calcular Orçamento</button>
+                <button class="btn btn-clear" onclick="limparFormulario('orcamento')">Limpar</button>
+                <div id="resultado_orcamento"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Aguardar carregamento do DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar navegação das abas
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    showTab(tabName, this);
+                });
+            });
+
+            // Validação de inputs negativos
+            const numeroInputs = document.querySelectorAll('input[type="number"]');
+            numeroInputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value < 0) {
+                        this.value = 0;
+                        alert('Valores negativos não são permitidos!');
+                    }
+                });
+            });
+        });
+
+        // Função para alternar entre abas
+        function showTab(tabName, clickedTab) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            clickedTab.classList.add('active');
+        }
+
+        // Função para calcular alvenaria
+        function calcularAlvenaria() {
+            const comprimento = parseFloat(document.getElementById('comprimento_parede').value);
+            const altura = parseFloat(document.getElementById('altura_parede').value);
+            const tipoTijolo = parseFloat(document.getElementById('tipo_tijolo').value);
+            const areaAberturas = parseFloat(document.getElementById('area_aberturas').value) || 0;
+
+            if (!comprimento || !altura) {
+                alert('Preencha todas as medidas!');
+                return;
+            }
+
+            const areaTotal = (comprimento * altura) - areaAberturas;
+            const quantTijolos = Math.ceil(areaTotal * tipoTijolo);
+            const cimento = Math.ceil((areaTotal * 0.03) / 50);
+            const areia = (areaTotal * 0.024).toFixed(2);
+
+            const precoCimento = parseFloat(document.getElementById('preco_cimento').value) || 32;
+            const precoAreia = parseFloat(document.getElementById('preco_areia').value) || 45;
+            const precoTijolo = parseFloat(document.getElementById('preco_tijolo').value) || 450;
+
+            const custoTotal = (quantTijolos/1000 * precoTijolo) + (cimento * precoCimento) + (areia * precoAreia);
+
+            const resultado = '<div class="result">' +
+                '<h4>📊 Resultado do Cálculo - Alvenaria</h4>' +
+                '<div class="result-item"><span>Área da parede:</span><span>' + areaTotal.toFixed(2) + ' m²</span></div>' +
+                '<div class="result-item"><span>Tijolos necessários:</span><span>' + quantTijolos + ' unidades</span></div>' +
+                '<div class="result-item"><span>Cimento:</span><span>' + cimento + ' sacos</span></div>' +
+                '<div class="result-item"><span>Areia:</span><span>' + areia + ' m³</span></div>' +
+                '<div class="result-item"><span>Custo estimado:</span><span>R$ ' + custoTotal.toFixed(2) + '</span></div>' +
+                '</div>';
+
+            document.getElementById('resultado_alvenaria').innerHTML = resultado;
+        }
+
+        // Função para calcular concreto
+        function calcularConcreto() {
+            const comprimento = parseFloat(document.getElementById('comprimento_concreto').value);
+            const largura = parseFloat(document.getElementById('largura_concreto').value);
+            const espessura = parseFloat(document.getElementById('espessura_concreto').value) / 100;
+            const tipoConcreto = document.getElementById('tipo_concreto').value;
+
+            if (!comprimento || !largura || !espessura) {
+                alert('Preencha todas as medidas!');
+                return;
+            }
+
+            const volume = comprimento * largura * espessura;
+            const volumeComPerda = volume * 1.1;
+
+            let cimento, areia, brita;
+            
+            switch(tipoConcreto) {
+                case '1:2:3':
+                    cimento = Math.ceil(volumeComPerda * 7);
+                    areia = (volumeComPerda * 0.4).toFixed(2);
+                    brita = (volumeComPerda * 0.6).toFixed(2);
+                    break;
+                case '1:3:4':
+                    cimento = Math.ceil(volumeComPerda * 5.5);
+                    areia = (volumeComPerda * 0.45).toFixed(2);
+                    brita = (volumeComPerda * 0.65).toFixed(2);
+                    break;
+                case '1:2:2':
+                    cimento = Math.ceil(volumeComPerda * 9);
+                    areia = (volumeComPerda * 0.35).toFixed(2);
+                    brita = (volumeComPerda * 0.35).toFixed(2);
+                    break;
+            }
+
+            const precoCimento = parseFloat(document.getElementById('preco_cimento').value) || 32;
+            const precoAreia = parseFloat(document.getElementById('preco_areia').value) || 45;
+            const precoBrita = parseFloat(document.getElementById('preco_brita').value) || 50;
+
+            const custoTotal = (cimento * precoCimento) + (areia * precoAreia) + (brita * precoBrita);
+
+            const resultado = '<div class="result">' +
+                '<h4>📊 Resultado do Cálculo - Concreto</h4>' +
+                '<div class="result-item"><span>Volume de concreto:</span><span>' + volume.toFixed(3) + ' m³</span></div>' +
+                '<div class="result-item"><span>Volume c/ perda (10%):</span><span>' + volumeComPerda.toFixed(3) + ' m³</span></div>' +
+                '<div class="result-item"><span>Traço:</span><span>' + tipoConcreto + '</span></div>' +
+                '<div class="result-item"><span>Cimento:</span><span>' + cimento + ' sacos</span></div>' +
+                '<div class="result-item"><span>Areia:</span><span>' + areia + ' m³</span></div>' +
+                '<div class="result-item"><span>Brita:</span><span>' + brita + ' m³</span></div>' +
+                '<div class="result-item"><span>Custo estimado:</span><span>R$ ' + custoTotal.toFixed(2) + '</span></div>' +
+                '</div>';
+
+            document.getElementById('resultado_concreto').innerHTML = resultado;
+        }
+
+        // Função para calcular cerâmica
+        function calcularCeramica() {
+            const comprimento = parseFloat(document.getElementById('comprimento_ceramica').value);
+            const largura = parseFloat(document.getElementById('largura_ceramica').value);
+            const tamanhoCeramica = parseFloat(document.getElementById('tamanho_ceramica').value);
+            const quebraPct = parseFloat(document.getElementById('quebra_ceramica').value) / 100;
+
+            if (!comprimento || !largura) {
+                alert('Preencha as medidas do ambiente!');
+                return;
+            }
+
+            const area = comprimento * largura;
+            const pecasNecessarias = Math.ceil(area / tamanhoCeramica);
+            const pecasComQuebra = Math.ceil(pecasNecessarias * (1 + quebraPct));
+            const argamassa = Math.ceil((area * 4) / 20);
+            const rejunte = Math.ceil(area / 10);
+
+            const precoCeramica = parseFloat(document.getElementById('preco_ceramica_m2').value) || 25;
+            const custoTotal = area * precoCeramica;
+
+            const resultado = '<div class="result">' +
+                '<h4>📊 Resultado do Cálculo - Cerâmica</h4>' +
+                '<div class="result-item"><span>Área do ambiente:</span><span>' + area.toFixed(2) + ' m²</span></div>' +
+                '<div class="result-item"><span>Peças necessárias:</span><span>' + pecasNecessarias + ' unidades</span></div>' +
+                '<div class="result-item"><span>Peças c/ quebra (' + (quebraPct*100).toFixed(0) + '%):</span><span>' + pecasComQuebra + ' unidades</span></div>' +
+                '<div class="result-item"><span>Argamassa colante:</span><span>' + argamassa + ' sacos de 20kg</span></div>' +
+                '<div class="result-item"><span>Rejunte:</span><span>' + rejunte + ' kg</span></div>' +
+                '<div class="result-item"><span>Custo estimado cerâmica:</span><span>R$ ' + custoTotal.toFixed(2) + '</span></div>' +
+                '</div>';
+
+            document.getElementById('resultado_ceramica').innerHTML = resultado;
+        }
+
+        // Função para calcular tinta
+        function calcularTinta() {
+            const area = parseFloat(document.getElementById('area_pintura').value);
+            const rendimento = parseFloat(document.getElementById('tipo_tinta').value);
+            const demaos = parseInt(document.getElementById('num_demaos').value);
+            const precisaPrimer = document.getElementById('precisa_primer').value;
+
+            if (!area) {
+                alert('Preencha a área a ser pintada!');
+                return;
+            }
+
+            const litrosTinta = Math.ceil((area * demaos) / rendimento);
+            const litrosPrimer = precisaPrimer === 'sim' ? Math.ceil(area / 12) : 0;
+            
+            const precoTinta = parseFloat(document.getElementById('preco_tinta_litro').value) || 35;
+            const custoTotal = (litrosTinta + litrosPrimer) * precoTinta;
+
+            const resultado = '<div class="result">' +
+                '<h4>📊 Resultado do Cálculo - Pintura</h4>' +
+                '<div class="result-item"><span>Área a pintar:</span><span>' + area.toFixed(2) + ' m²</span></div>' +
+                '<div class="result-item"><span>Número de demãos:</span><span>' + demaos + '</span></div>' +
+                '<div class="result-item"><span>Tinta necessária:</span><span>' + litrosTinta + ' litros</span></div>' +
+                (precisaPrimer === 'sim' ? '<div class="result-item"><span>Primer/Selador:</span><span>' + litrosPrimer + ' litros</span></div>' : '') +
+                '<div class="result-item"><span>Custo estimado:</span><span>R$ ' + custoTotal.toFixed(2) + '</span></div>' +
+                '</div>';
+
+            document.getElementById('resultado_tinta').innerHTML = resultado;
+        }
+
+        // Função para calcular ferragem
+        function calcularFerragem() {
+            const volume = parseFloat(document.getElementById('volume_ferragem').value);
+            const kgPorM3 = parseFloat(document.getElementById('tipo_estrutura').value);
+            const bitola = parseFloat(document.getElementById('bitola_principal').value);
+
+            if (!volume) {
+                alert('Preencha o volume de concreto!');
+                return;
+            }
+
+            const pesoTotal = volume * kgPorM3;
+            const pesoPrincipal = Math.ceil(pesoTotal * 0.6);
+            const pesoSecundario = Math.ceil(pesoTotal * 0.25);
+            const pesoEstribo = Math.ceil(pesoTotal * 0.15);
+
+            const barrasPrincipal = Math.ceil(pesoPrincipal / (bitola * bitola * 0.00617 * 12));
+            
+            const precoFerro = parseFloat(document.getElementById('preco_ferro_kg').value) || 6.5;
+            const custoTotal = pesoTotal * precoFerro;
+
+            const resultado = '<div class="result">' +
+                '<h4>📊 Resultado do Cálculo - Ferragem</h4>' +
+                '<div class="result-item"><span>Volume de concreto:</span><span>' + volume.toFixed(2) + ' m³</span></div>' +
+                '<div class="result-item"><span>Peso total de ferro:</span><span>' + pesoTotal.toFixed(1) + ' kg</span></div>' +
+                '<div class="result-item"><span>Ferro principal (' + bitola + 'mm):</span><span>' + pesoPrincipal + ' kg (' + barrasPrincipal + ' barras)</span></div>' +
+                '<div class="result-item"><span>Ferro secundário:</span><span>' + pesoSecundario + ' kg</span></div>' +
+                '<div class="result-item"><span>Estribos:</span><span>' + pesoEstribo + ' kg</span></div>' +
+                '<div class="result-item"><span>Custo estimado:</span><span>R$ ' + custoTotal.toFixed(2) + '</span></div>' +
+                '</div>';
+
+            document.getElementById('resultado_ferragem').innerHTML = resultado;
+        }
+
+        // Função para calcular orçamento
+        function calcularOrcamento() {
+            const area = parseFloat(document.getElementById('area_total_obra').value);
+            const custoPorM2 = parseFloat(document.getElementById('padrao_acabamento').value);
+
+            if (!area) {
+                alert('Preencha a área total da obra!');
+                return;
+            }
+
+            const custoTotal = area * custoPorM2;
+            const material = custoTotal * 0.65;
+            const maoObra = custoTotal * 0.35;
+
+            const estrutura = custoTotal * 0.25;
+            const alvenaria = custoTotal * 0.20;
+            const cobertura = custoTotal * 0.15;
+            const instalacoes = custoTotal * 0.20;
+            const acabamento = custoTotal * 0.20;
+
+            const resultado = '<div class="result">' +
+                '<h4>📊 Orçamento da Obra</h4>' +
+                '<div class="result-item"><span>Área total:</span><span>' + area.toFixed(2) + ' m²</span></div>' +
+                '<div class="result-item"><span>Custo por m²:</span><span>R$ ' + custoPorM2.toFixed(2) + '</span></div>' +
+                '<div class="result-item"><span>Material (65%):</span><span>R$ ' + material.toFixed(2) + '</span></div>' +
+                '<div class="result-item"><span>Mão de obra (35%):</span><span>R$ ' + maoObra.toFixed(2) + '</span></div>' +
+                '<hr style="margin: 15px 0; border: 1px solid rgba(255,255,255,0.3);">' +
+                '<div class="result-item" style="font-size: 0.9em;"><span>Estrutura (25%):</span><span>R$ ' + estrutura.toFixed(2) + '</span></div>' +
+                '<div class="result-item" style="font-size: 0.9em;"><span>Alvenaria (20%):</span><span>R$ ' + alvenaria.toFixed(2) + '</span></div>' +
+                '<div class="result-item" style="font-size: 0.9em;"><span>Cobertura (15%):</span><span>R$ ' + cobertura.toFixed(2) + '</span></div>' +
+                '<div class="result-item" style="font-size: 0.9em;"><span>Instalações (20%):</span><span>R$ ' + instalacoes.toFixed(2) + '</span></div>' +
+                '<div class="result-item" style="font-size: 0.9em;"><span>Acabamento (20%):</span><span>R$ ' + acabamento.toFixed(2) + '</span></div>' +
+                '<hr style="margin: 15px 0; border: 2px solid rgba(255,255,255,0.5);">' +
+                '<div class="result-item" style="font-size: 1.2em; font-weight: bold;"><span>CUSTO TOTAL:</span><span>R$ ' + custoTotal.toFixed(2) + '</span></div>' +
+                '</div>';
+
+            document.getElementById('resultado_orcamento').innerHTML = resultado;
+        }
+
+        // Função para limpar formulário
+        function limparFormulario(tabId) {
+            const inputs = document.querySelectorAll('#' + tabId + ' input');
+            inputs.forEach(input => {
+                if (input.type === 'number') {
+                    if (input.id === 'area_aberturas' || input.id === 'quebra_ceramica' || input.id === 'num_demaos') {
+                        input.value = input.defaultValue;
+                    } else if (input.id.startsWith('preco_')) {
+                        // Manter preços padrão
+                    } else {
+                        input.value = '';
+                    }
+                }
+            });
+            
+            const selects = document.querySelectorAll('#' + tabId + ' select');
+            selects.forEach(select => {
+                select.selectedIndex = 0;
+            });
+            
+            // Limpar resultado
+            const resultadoId = 'resultado_' + tabId.replace('_', '');
+            const resultDiv = document.getElementById(resultadoId);
+            if (resultDiv) {
+                resultDiv.innerHTML = '';
+            }
+        }
+
+        // Validação de inputs negativos
+        document.addEventListener('DOMContentLoaded', function() {
+            const numeroInputs = document.querySelectorAll('input[type="number"]');
+            numeroInputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value < 0) {
+                        this.value = 0;
+                        alert('Valores negativos não são permitidos!');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
